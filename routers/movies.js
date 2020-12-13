@@ -34,6 +34,30 @@ const routerProvider = (app) => {
       next(err);
     }
   });
+  router.get('/:id', async (req, res, next) => {
+    try {
+      console.log('using latest version');
+      const response = await Promise.resolve(movies[0]);
+      res.status(200).json({
+        data: response,
+        message: 'movies listed'
+      });
+    } catch(err) {
+      next(err);
+    }
+  });
+  router.put('/:id', async (req, res, next) => {
+    try {
+      console.log('using latest version');
+      const response = await Promise.resolve(movies[0]);
+      res.status(200).json({
+        data: response.id,
+        message: 'movies listed'
+      });
+    } catch(err) {
+      next(err);
+    }
+  });
   app.use('/movies', router);
 };
 
