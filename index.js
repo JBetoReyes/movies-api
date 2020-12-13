@@ -1,9 +1,13 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 
 const { config } = require('./config/index');
 
-app.get('/', (req, res) => {
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post('/', (req, res) => {
   res.send('Hello world');
 });
 
