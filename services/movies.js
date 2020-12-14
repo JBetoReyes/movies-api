@@ -1,6 +1,13 @@
 const { movies: moviesMock } = require('../utils/mocks/movies.js');
+const MongoLib = require('../lib/mongo.js'); 
 
 class MoviesService {
+  constructor() {
+    this.collection = 'movies';
+    this.connection = new MongoLib(); 
+    this.connection.connect();
+  }
+
   async getMovies() {
     const movies = await Promise.resolve(moviesMock);
     return movies || [];

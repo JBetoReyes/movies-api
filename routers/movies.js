@@ -7,8 +7,8 @@ const routerProvider = (app) => {
 
   router.get('/', async (req, res, next) => {
     try {
-      console.log('using latest version');
-      const response = await service.getMovies();
+      const { tags } = req.query; 
+      const response = await service.getMovies({tags});
       res.status(200).json({
         data: response,
         message: 'movies listed'
@@ -22,7 +22,7 @@ const routerProvider = (app) => {
     try {
       const {body} = req;
       const movie = body.data;
-      const response = await service.createMovie(); 
+      const response = await service.createMovie({movie}); 
       res.status(201).json({
         data: {
           response,
@@ -38,7 +38,8 @@ const routerProvider = (app) => {
   router.get('/:id', async (req, res, next) => {
     try {
       console.log('using latest version');
-      const response = service.getMovie(0); 
+      const { id } = req.params;
+      const response = service.getMovie({id});
       res.status(200).json({
         data: response,
         message: 'movies listed'
