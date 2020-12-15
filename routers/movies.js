@@ -1,5 +1,12 @@
 const { Router } = require('express');
+const joi = require('@hapi/joi');
 const { MoviesService } = require('../services/movies.js'); 
+const { validateHandler } = require('../utils/middleware/validationHandler.js');
+const {
+  movieIdSchema,
+  createMovieSchema,
+  updateMovieSchema
+} = require('../utils/schemas/movies.js');
 
 const routerProvider = (app) => {
   const service = new MoviesService();
@@ -18,7 +25,7 @@ const routerProvider = (app) => {
     }
   });
 
-  router.post('/' ,async (req, res, next) => {
+  router.post('/', validateHandler(createMovieSchema),async (req, res, next) => {
     try {
       const {body} = req;
       const movie = body.data;
@@ -35,7 +42,7 @@ const routerProvider = (app) => {
       next(err);
     }
   });
-  router.get('/:id', async (req, res, next) => {
+  router.get('/:id',validateHandler(joi.object({ id: movieIdSchema }), 'params'), async (req, res, next) => {
     try {
       console.log('using latest version');
       const { id } = req.params;
@@ -48,7 +55,7 @@ const routerProvider = (app) => {
       next(err);
     }
   });
-  router.put('/:id', async (req, res, next) => {
+  router.put('/:id', validateHandler(joi.object({ id: movieIdSchema }), 'params'), validateHandler(updateMovieSchema, 'body'),async (req, res, next) => {
     try {
       const { id } = req.params;
       const { data: movie } = req.body;

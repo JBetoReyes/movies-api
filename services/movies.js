@@ -24,7 +24,7 @@ class MoviesService {
   }
   
   async updateMovie(id, data) {
-    const updatedMovieId = this.mongo.update(id, data);
+    const updatedMovieId = this.mongo.update(this.collection, id, data);
     return updatedMovieId;
   }
 
