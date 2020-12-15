@@ -22,11 +22,11 @@ const routerProvider = (app) => {
     try {
       const {body} = req;
       const movie = body.data;
-      const response = await service.createMovie({movie}); 
+      const movieId= await service.createMovie(movie); 
       res.status(201).json({
         data: {
-          response,
-          movie
+          id: movieId,
+          ...movie
         },
         message: 'movies persisted'
       });
@@ -50,8 +50,9 @@ const routerProvider = (app) => {
   });
   router.put('/:id', async (req, res, next) => {
     try {
-      console.log('using latest version');
-      const response = await service.updateMovie();
+      const { id } = req.params;
+      const { data: movie } = req.body;
+      const response = await service.updateMovie(id, movie);
       res.status(200).json({
         data: response,
         message: 'movies listed'
