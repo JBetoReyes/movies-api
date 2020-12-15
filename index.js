@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { mainRouterProvider } = require('./routers');
-const { errorHandler } = require('./utils/middleware/erroHandler.js');
+const { errorHandler, logErrors, wrapErrors } = require('./utils/middleware/errorHandler.js');
+const { notFoundHandler } = require('./utils/middleware/notFoundHandler.js');
 
 const app = express();
 
@@ -12,6 +13,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mainRouterProvider(app);
 
+// Not found handler
+app.use(notFoundHandler);
+
+// Error middlewares
+app.use(logErrors);
+app.use(wrapErrors);
 app.use(errorHandler);
 
 app.listen(config.port, () => {
