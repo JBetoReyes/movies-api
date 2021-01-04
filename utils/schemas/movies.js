@@ -20,7 +20,7 @@ const createMovieSchema = joi.object({
     contentRating: movieContentRatingSchema.required(),
     source: movieSourceSchema.required(),
     tags: movieTagSchema.required()
-  })
+ })
 });
 
 const updateMovieSchema = joi.object({ 
