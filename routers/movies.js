@@ -8,6 +8,9 @@ const {
   createMovieSchema,
   updateMovieSchema,
 } = require("../utils/schemas/movies.js");
+const {
+  scopesValidationHandler,
+} = require("../utils/middleware/scopesValidationHandler.js");
 
 require("../utils/auth/strategies/jwt.js");
 
@@ -18,6 +21,7 @@ const routerProvider = (app) => {
   router.get(
     "/",
     passport.authenticate("jwt", { session: false }),
+    scopesValidationHandler(["read:movies"]),
     async (req, res, next) => {
       try {
         const { tags } = req.query;
@@ -35,6 +39,7 @@ const routerProvider = (app) => {
   router.post(
     "/",
     passport.authenticate("jwt", { session: false }),
+    scopesValidationHandler(["create:movies"]),
     validateHandler(createMovieSchema),
     async (req, res, next) => {
       try {
@@ -57,6 +62,7 @@ const routerProvider = (app) => {
   router.get(
     "/:id",
     passport.authenticate("jwt", { session: false }),
+    scopesValidationHandler(["read:movies"]),
     validateHandler(joi.object({ id: movieIdSchema }), "params"),
     async (req, res, next) => {
       try {
@@ -75,6 +81,7 @@ const routerProvider = (app) => {
   router.put(
     "/:id",
     validateHandler(joi.object({ id: movieIdSchema }), "params"),
+    scopesValidationHandler(["update:movies"]),
     validateHandler(updateMovieSchema, "body"),
     async (req, res, next) => {
       try {
@@ -93,6 +100,7 @@ const routerProvider = (app) => {
   router.delete(
     "/:id",
     passport.authenticate("jwt", { session: false }),
+    scopesValidationHandler(["delete:movies"]),
     async (req, res, next) => {
       try {
         console.log("using latest version");

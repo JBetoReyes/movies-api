@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const joi = require("@hapi/joi");
+const passport = require("passport");
 const { validateHandler } = require("../utils/middleware/validationHandler.js");
 const { UserMoviesService } = require("../services/userMovies.js");
 const {
@@ -7,6 +8,11 @@ const {
   CreateUserMoviesSchema,
 } = require("../utils/schemas/userMovies");
 const { userIdSchema } = require("../utils/schemas/users");
+const {
+  scopesValidationHandler,
+} = require("../utils/middleware/scopesValidationHandler.js");
+
+require("../utils/auth/strategies/jwt.js");
 
 const routerProvider = (app) => {
   const service = new UserMoviesService();
@@ -14,6 +20,8 @@ const routerProvider = (app) => {
   app.use("/user-movies", router);
   router.get(
     "/",
+    passport.authenticate("jwt", { session: false }),
+    scopesValidationHandler(["read:user-movies"]),
     validateHandler(joi.object({ userId: userIdSchema }), "query"),
     async (req, res, next) => {
       try {
@@ -30,6 +38,8 @@ const routerProvider = (app) => {
   );
   router.post(
     "/",
+    passport.authenticate("jwt", { session: false }),
+    scopesValidationHandler(["create:user-movies"]),
     validateHandler(CreateUserMoviesSchema),
     async (req, res, next) => {
       const { userMovie } = req.body.data;
@@ -49,6 +59,8 @@ const routerProvider = (app) => {
 
   router.delete(
     "/:userMovieId",
+    passport.authenticate("jwt", { session: false }),
+    scopesValidationHandler(["delete:user-movies"]),
     validateHandler(joi.object({ userMovieId: UserMoviesIdSchema }), "params"),
     async (req, res, next) => {
       const { userMovieId } = req.params;
