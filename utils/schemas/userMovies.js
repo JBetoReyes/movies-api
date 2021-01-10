@@ -5,12 +5,16 @@ const { userIdSchema } = require("./users.js");
 const UserMoviesIdSchema = joi.string().regex(/^[0-9a-fA-F]{24}$/);
 
 const CreateUserMoviesSchema = joi.object({
-  data: joi.object({
-    userMovie: joi.object({
-      userId: userIdSchema,
-      movieId: movieIdSchema,
-    }),
-  }),
+  data: joi
+    .object({
+      userMovie: joi
+        .object({
+          userId: userIdSchema.required(),
+          movieId: movieIdSchema.required(),
+        })
+        .required(),
+    })
+    .required(),
 });
 
 module.exports = {
