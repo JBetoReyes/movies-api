@@ -8,17 +8,20 @@ class UserMoviesService {
 
   async getUserMovies({ userId }) {
     const query = userId && { userId };
-    const movies = await this.mongoDb(this.collection, query);
+    const movies = await this.mongoDb.getAll(this.collection, query);
     return movies || [];
   }
 
   async createUserMovies({ userMovie }) {
-    const userMovieId = await this.mongoDb(this.collection, userMovie);
+    const userMovieId = await this.mongoDb.create(this.collection, userMovie);
     return userMovieId;
   }
 
   async deleteUserMovies({ userMovieId }) {
-    const deletedUserMovieId = await this.mongDb(this.collection, userMovieId);
+    const deletedUserMovieId = await this.mongoDb.delete(
+      this.collection,
+      userMovieId
+    );
     return deletedUserMovieId;
   }
 }
