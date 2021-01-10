@@ -36,7 +36,6 @@ const routerProvider = (app) => {
             return;
           }
           const apiKey = await apiKeyService.getKey({ token: apiKeyToken });
-
           if (!apiKey) {
             next(boom.unauthorized());
             return;
@@ -48,6 +47,7 @@ const routerProvider = (app) => {
             id,
             name,
             email,
+            scopes: apiKey.scopes,
           };
 
           const token = jwt.sign(payload, config.authJWTSecret, {
