@@ -8,7 +8,6 @@ const validate = (data, schema) => {
 const validateHandler = (schema, check = 'body') => { 
   return (req, res, next) => {
     const dataToValidate = req[check];
-    console.log('data to validate', dataToValidate);
     const error = validate(dataToValidate, schema);
     error ? next(boom.badRequest(error)) : next();
   }
