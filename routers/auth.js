@@ -6,7 +6,10 @@ const { config } = require("../config");
 const UserService = require("../services/users.js");
 const ApiKeyService = require("../services/apiKeys.js");
 const { validateHandler } = require("../utils/middleware/validationHandler.js");
-const { createUserSchema } = require("../utils/schemas/users");
+const {
+  createUserSchema,
+  createProviderUserSchema,
+} = require("../utils/schemas/users");
 
 require("../utils/auth/strategies/basic.js");
 
@@ -61,17 +64,54 @@ const routerProvider = (app) => {
       }
     })(req, res, next);
   });
+  validateHandler(),
+    router.post(
+      "/sign-up",
+      validateHandler(createUserSchema),
+      async (req, res, next) => {
+        const { user } = req.body.data;
+        try {
+          const userId = await userService.createUser({ user });
+          res.status(201).json({
+            data: userId,
+            message: "user created",
+          });
+        } catch (err) {
+          next(err);
+        }
+      }
+    );
 
   router.post(
-    "/sign-up",
-    validateHandler(createUserSchema),
+    "/sign-provider",
+    validateHandler(createProviderUserSchema),
     async (req, res, next) => {
-      const { user } = req.body.data;
+      const { data } = req.body;
+      const { apiKeyToken, ...user } = data;
+      if (!apiKeyToken) {
+        next(boom.unauthorized());
+        return;
+      }
       try {
-        const userId = await userService.createUser({ user });
-        res.status(201).json({
-          data: userId,
-          message: "user created",
+        const queriedUser = await userService.getOrCreate({ user });
+        const apiKey = await apiKeyService.getKey({ token: apiKeyToken });
+        if (!apiKey) {
+          next(boom.unauthorized());
+          return;
+        }
+        const { _id: id, email, name } = queriedUser;
+        const payload = {
+          sub: id,
+          name,
+          email,
+          scopes: apiKey.scopes,
+        };
+        const token = jwt.sign(payload, config.authJWTSecret, {
+          expiresIn: "15m",
+        });
+        return res.status(200).json({
+          token,
+          ...payload,
         });
       } catch (err) {
         next(err);
